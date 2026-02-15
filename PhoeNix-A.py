@@ -7,7 +7,53 @@ try:
 except Exception as e:
     print(e)
 
-antivm = r"""
+antilog = r"""
+import builtins, os, io, sys
+
+class _DummyFile:
+    def write(self, *a, **k): return len(a[0]) if a else 0
+    def writelines(self, *a, **k): pass
+    def flush(self): pass
+    def close(self): pass
+    def __enter__(self): return self
+    def __exit__(self, *a): pass
+
+_real_open = builtins.open
+_real_io_open = io.open
+_real_os_open = os.open
+_real_os_write = os.write
+
+def _is_write_mode(mode):
+    return any(m in mode for m in ('w', 'a', 'x', '+'))
+
+def secure_open(file, mode='r', *args, **kwargs):
+    if _is_write_mode(mode):
+        return _DummyFile()
+    return _real_open(file, mode, *args, **kwargs)
+
+builtins.open = secure_open
+io.open = secure_open
+
+def secure_os_open(path, flags, *args):
+    if flags & (os.O_WRONLY | os.O_APPEND | os.O_RDWR):
+        raise PermissionError("Log blocked")
+    return _real_os_open(path, flags, *args)
+
+os.open = secure_os_open
+
+def secure_os_write(fd, data):
+    return len(data)
+
+os.write = secure_os_write
+
+def _protect():
+    builtins.open = secure_open
+    io.open = secure_open
+    os.open = secure_os_open
+    os.write = secure_os_write
+
+sys.modules['builtins'].open = secure_open"""
+antivm = """
 try:
     _vm = 0
     import uuid, socket, multiprocessing, platform
@@ -288,7 +334,76 @@ except:
         pass
     print("Anhnguyencoder...")
     raise MemoryError
+
+import builtins, sys, os
+
+_real_open = builtins.open
+
+def antilog(file, mode='r', *args, **kwargs):
+    if any(m in mode for m in ('w', 'a', 'x')):
+        filename = str(file).lower()
+        if "log" in filename:
+            raise MemoryError
+    return _real_open(file, mode, *args, **kwargs)
+
+builtins.open = antilog
 """
+
+mupvailol = r"""
+list_func = ['print', 'open']
+hooked_funcs = {}
+inspect = __import__('inspect')
+def hooknoi(func_name, *args, **kwargs):
+    checked_paths = set()
+    for frame in inspect.stack():
+        filename = frame.filename
+        if filename not in checked_paths:
+            checked_paths.add(filename)
+            try:
+                module_names = ['requests', 'pystyle', 'ssl', 'socket', 'inspect', 'urllib']
+                for module_name in module_names:
+                    try:
+                        if "requests" in module_name:
+                            requests_path = __import__('os').path.dirname(__import__('os').path.abspath(__import__('requests').__file__))
+                            api_path = __import__('os').path.join(requests_path, 'api.py')
+                            if api_path in frame.filename:
+                                try:__import__('sys').exit(f"Lỗi , Hãy Cài Lại Thư Viện Requests")
+                                except:pass
+                                finally:__import__('sys').exit(f"Lỗi , Hãy Cài Lại Thư Viện Requests")
+                        module_path = __import__('os').path.abspath(__import__(module_name).__file__)
+                        if module_path in filename:
+                            try:__import__('sys').exit(f"Lỗi , Hãy Cài Lại Thư Viện {api_path}")
+                            except:pass
+                            finally:__import__('sys').exit(f"Lỗi , Hãy Cài Lại Thư Viện {api_path}")
+                    except (ImportError, AttributeError,ModuleNotFoundError):
+                        continue
+            except Exception:
+                pass
+    hooked_funcs[func_name](*args, **kwargs)
+def chimcubu():
+    for func_name in list_func:
+        try:
+            func = getattr(__builtins__, func_name)
+            hooked_funcs[func_name] = func
+            setattr(__builtins__, func_name, lambda *args, func_name=func_name, **kwargs: hooknoi(func_name, *args, **kwargs))
+        except AttributeError:
+            raise MemoryError
+def nohook():
+    for func_name, original_func in hooked_funcs.items():
+        setattr(__builtins__, func_name, original_func)
+    hooked_funcs.clear()
+chimcubu()
+import inspect
+nohook()
+"""
+
+dz=  mupvailol.encode()
+
+hookcc = f'''
+
+exec({dz})
+
+# '''
 
 antiglb = r"""
 import inspect,sys,types,itertools,importlib,linecache,os,re,dis
@@ -1614,7 +1729,7 @@ def mahoa(code: str):
     sexy1 = obf_var + d_var + ANTI_MEMORY + lolmemaythomlam
     sexy2 = sexy + sexy1
 
-    minhanh = moreobf1(sexy2)
+    minhanh = moreobf1(sexy2 + antilog + hookcc)
 
     tree = ast.parse(code)
     tree = Obf().visit(tree)
