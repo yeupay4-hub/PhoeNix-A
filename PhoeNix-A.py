@@ -1534,8 +1534,8 @@ def moreobf1(src: str) -> str:
     tree = ast.parse(src)
 
     def rd():
-        return '_' + ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=8))
-
+        return '__x0_' + ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=5))
+        
     def wrap_stmt(stmt):
         state = rd()
         err = rd()
@@ -1656,30 +1656,30 @@ def mahoa(code: str):
     code = minhanh + enc2
     code = ANTI_PYCDC + code
 
-    no1 = speed(code)
-    no1 = ast.unparse(no1)
-    code = ast.parse(chimto(lop_gia(no1)))
+    no1 = ast.parse(speed(code))
+    code = chimto(lop_gia(no1))
     final = __moreobf(code)
     code = final
 
-    final_code = m.dumps(compile(code, '<FoNixA>', 'exec'))
+    code = m.dumps(compile(code, '<FoNixA>', 'exec'))
 
-    final_code = lz.compress(final_code)
-    final_code = zl.compress(final_code)
-    final_code = bz.compress(final_code)
-    final_code = b64.b85encode(final_code)
+    code = lz.compress(code)
+    code = zl.compress(code)
+    code = bz.compress(code)
+    code = b64.b85encode(code)
 
-    return final_code[::-1]
+    return code[::-1]
 
 if __name__ == "__main__":
     from pystyle import Add,Center,Anime,Colors,Colorate,Write,System
     from sys import platform
-    sys.setrecursionlimit(99999999)
 
+
+    sys.setrecursionlimit(99999999)        
     ver = str(sys.version_info.major)+'.'+str(sys.version_info.minor)
 
     try:
-        import random, marshal, base64, bz2, zlib, lzma, time, sys, builtins, ast
+        import random, marshal, base64, bz2, zlib, lzma, time, sys, builtins, ast, requests
         from pystyle import Add,Center,Anime,Colors,Colorate,Write,System
         from sys import platform
         from ast import *
