@@ -1621,9 +1621,8 @@ def mahoa(code: str):
     ast.fix_missing_locations(tree)
     cuto = ast.unparse(tree)
 
-    compiled = compile(cuto, "<FoNixA>", "exec")
-    raw = m.dumps(compiled)
-    fake = lol(raw)
+    dump = m.dumps(compile(ast.parse(cuto), "<FoNixA>", "exec"))
+    fake = lol(dump)
 
     pairs = xor(fake)
     mapped_hex = phoenixa(fake.replace('\n', ''))
