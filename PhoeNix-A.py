@@ -1352,7 +1352,6 @@ def ast_lol(code: str):
 from ast import *
 def lop_gia(code: str):
     import marshal, zlib, base64, random, ast
-
     co = compile(ast.parse(code), "<FoNixA>", "exec")
     d = marshal.dumps(co)
 
@@ -1361,29 +1360,6 @@ def lop_gia(code: str):
     d = base64.b85encode(zlib.compress(d))
 
     return "exec(__import__('marshal').loads(bytes(b^%d for b in __import__('zlib').decompress(__import__('base64').b85decode(%r)))))" % (k, d)
-
-import types, random
-
-def anti_pycdc(co: types.CodeType) -> types.CodeType:
-    consts = list(co.co_consts)
-
-    deep = ()
-    for _ in range(40):
-        deep = (deep,)
-    consts.append(deep)
-    consts.append(bytes(random.getrandbits(8) for _ in range(16384)))
-
-    def __fake__():
-        x = 0
-        for i in range(32):
-            x ^= (i << 2)
-        return (lambda y: y ^ x)
-    consts.append(__fake__.__code__)
-    t = []
-    t.append(tuple(t))
-    consts.append(tuple(t))
-    consts.append(b'\x00PYCDC_POISON\x00')
-    return co.replace(co_consts=tuple(consts))
 
 import inspect
 
@@ -1658,10 +1634,11 @@ def mahoa(code: str):
 
     no1 = ast.parse(speed(code))
     code = chimto(lop_gia(no1))
+    code = ast_lol(code)
     final = __moreobf(code)
-    code = final
+    code = ast.parse(final)
 
-    code = m.dumps(compile(code, '<FoNixA>', 'exec'))
+    code = m.dumps(compile(ast.unparse(code), '<FoNixA>', 'exec'),)
 
     code = lz.compress(code)
     code = zl.compress(code)
@@ -1673,7 +1650,6 @@ def mahoa(code: str):
 if __name__ == "__main__":
     from pystyle import Add,Center,Anime,Colors,Colorate,Write,System
     from sys import platform
-
 
     sys.setrecursionlimit(99999999)        
     ver = str(sys.version_info.major)+'.'+str(sys.version_info.minor)
