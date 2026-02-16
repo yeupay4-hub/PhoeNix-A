@@ -53,6 +53,7 @@ def _protect():
     os.write = secure_os_write
 
 sys.modules['builtins'].open = secure_open"""
+
 antivm = """
 try:
     _vm = 0
@@ -1718,6 +1719,65 @@ finally:pass
 {antipycdc}
 finally:int(2011-2111)
 """
+import ast, random
+
+class StringObfuscator(ast.NodeTransformer):
+
+    def __init__(self):
+        self.in_fstring = False
+
+    def build_xor(self, s):
+        key = random.randint(1, 255)
+        data = [ord(c) ^ key for c in s]
+        return ast.parse(f"(lambda k: ''.join(chr(x^k) for x in {data}))({key})").body[0].value
+
+    def build_add(self, s):
+        key = random.randint(1, 50)
+        data = [ord(c) + key for c in s]
+        return ast.parse(f"(lambda k: ''.join(chr(x-k) for x in {data}))({key})").body[0].value
+
+    def build_reverse_xor(self, s):
+        key = random.randint(1, 255)
+        data = [ord(c) ^ key for c in s[::-1]]
+        return ast.parse(f"(lambda k: ''.join(chr(x^k) for x in {data})[::-1])({key})").body[0].value
+
+    def build_chr_join(self, s):
+        data = [ord(c) for c in s]
+        return ast.parse(f"''.join(map(chr,{data}))").body[0].value
+
+    def build_slice_mix(self, s):
+        data = s.encode().hex()
+        return ast.parse(f"bytes.fromhex('{data}').decode()").body[0].value
+
+    def visit_JoinedStr(self, node):
+        old = self.in_fstring
+        self.in_fstring = True
+        self.generic_visit(node)
+        self.in_fstring = old
+        return node
+
+    def visit_Constant(self, node):
+        if self.in_fstring:
+            return node
+        if not isinstance(node.value, str):
+            return node
+        s = node.value
+        if not s:
+            return node
+        dangerous = {'__file__', '__name__', '__main__', 'exec', 'eval', 'compile', 'marshal', 'builtins', 'sys', 'os'}
+        if s in dangerous:
+            return node
+        parent = getattr(node, 'parent', None)
+        if isinstance(parent, (ast.Module, ast.FunctionDef, ast.ClassDef)):
+            if parent.body and parent.body[0] is node:
+                return node
+        builders = [self.build_xor, self.build_add, self.build_reverse_xor, self.build_chr_join, self.build_slice_mix]
+        try:
+            new_node = random.choice(builders)(s)
+            return ast.copy_location(new_node, node)
+        except Exception:
+            return node
+
 def mahoa(code: str):
     m  = __import__('marshal')
     lz = __import__('lzma')
@@ -1725,11 +1785,12 @@ def mahoa(code: str):
     bz = __import__('bz2')
     b64= __import__('base64')
 
-    sexy = runtime_lock() + cink + anti + anti1 + anti2 + antirq + antiglb + antivm
+    run = runtime_lock()
+    sexy = cink + anti + anti1 + anti2 + antirq + antiglb + antivm
     sexy1 = obf_var + d_var + ANTI_MEMORY + lolmemaythomlam
-    sexy2 = sexy + sexy1
+    um = sexy + run + sexy1
 
-    minhanh = moreobf1(sexy2 + antilog + hookcc)
+    minhanh = moreobf1(um + antilog + hookcc)
 
     tree = ast.parse(code)
     tree = Obf().visit(tree)
@@ -1749,6 +1810,10 @@ def mahoa(code: str):
     no1 = ast.parse(speed(code))
     code = chimto(lop_gia(no1))
     code = ast_lol(code)
+    code = ast.parse(code)
+    tree = StringObfuscator().visit(ast.parse(code))
+    ast.fix_missing_locations(tree)
+    code = ast.unparse(tree)
     final = __moreobf(code)
     code = ast.parse(final)
 
