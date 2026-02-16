@@ -782,9 +782,6 @@ def antibypass():
     junk_code = []
     for i in range(3000):
         junk_code.append(f'\ndef _junk{i}():\n    x = {random.randint(1000, 9999)}\n    for n in range(50):\n        x ^= (n << {i % 5})\n    return x\n')
-    math_noise = []
-    for i in range(3000):
-        math_noise.append(f'x{i} = ({i} << 2) ^ ({i} * 13)')
     fake_flow = []
     for i in range(3000):
         fake_flow.append(f'\ntry:\n    if ({i} * {i}) % 5 == ({i * i}) % 5:\n        _junk{i % 10}()\nexcept:\n    pass\n')
@@ -838,11 +835,9 @@ def antibypass():
 {''.join(junk_code)}
 def __CTEVCLDZAI__(__chanankdi__):
     return __chanankdi__
-
 try:pass
 except:pass
 finally:pass
-{chr(10).join(math_noise)}
 {antipycdc}
 {''.join(fake_flow)}
 finally:int(2011-2011)
@@ -1820,7 +1815,7 @@ def mahoa(code: str):
     code = m.dumps(compile(ast.unparse(code), '<FoNixA>', 'exec'),)
 
     code = lz.compress(code)
-    code = zl.compress(code)
+    code = zl.compress(code,level=5)
     code = bz.compress(code)
     code = b64.b85encode(code)
 
