@@ -1799,16 +1799,18 @@ def mahoa(code: str):
     mapped_hex = phoenixa(fake.replace('\n', ''))
     enc2 = marshal_load(pairs, mapped_hex)
 
-    code = minhanh + enc2
+    code = ast.parse(minhanh + enc2)
+    code = ast.unparse(code)
+    
     code = ANTI_PYCDC + code
-
     no1 = ast.parse(speed(code))
     code = chimto(lop_gia(no1))
     code = ast_lol(code)
-    code = ast.parse(code)
+
     tree = StringObfuscator().visit(ast.parse(code))
     ast.fix_missing_locations(tree)
     code = ast.unparse(tree)
+
     final = __moreobf(code)
     code = ast.parse(final)
 
@@ -1824,7 +1826,10 @@ def mahoa(code: str):
 if __name__ == "__main__":
     from pystyle import Add,Center,Anime,Colors,Colorate,Write,System
     from sys import platform
-
+    
+    if sys.version_info[:2] == (3, 9):
+        raise RuntimeError("Python 3.9 is not supported. Please use Python 3.10+.")
+        
     sys.setrecursionlimit(99999999)        
     ver = str(sys.version_info.major)+'.'+str(sys.version_info.minor)
 
@@ -1940,6 +1945,9 @@ if __name__ == "__main__":
     print(stage2(Colorate.Diagonal(Colors.DynamicMIX((Col.red, Col.orange)), 'Hide Builtins...')))
     load = 76,111,97,100,105,110,103,46,46,46,13
 
+    caklol = "__Anhnguyencoder__"
+    bien = "__Anhnguyencoder__=vars(__import__('builtins'))['e'+'x'+'e'+'c']"
+
     lobby = f"""#!/bin/python{ver}
 # -*- coding: utf-8 -*-
 __OBF__ = ('FonixA')
@@ -1956,8 +1964,8 @@ if str(__import__("sys").version_info.major)+"."+str(__import__("sys").version_i
     __import__('sys').exit()
 else:
     getattr(__import__('sys').stdout,'write')(''.join(map(chr, {load})))
-
-try:exec(__import__{vip('marshal')}.loads(__import__{vip('lzma')}.decompress(__import__{vip('zlib')}.decompress(__import__{vip('bz2')}.decompress(__import__{vip('base64')}.b85decode({payload}[::-1]))))),globals())
+{bien}
+try:{caklol}(__import__{vip('marshal')}.loads(__import__{vip('lzma')}.decompress(__import__{vip('zlib')}.decompress(__import__{vip('bz2')}.decompress(__import__{vip('base64')}.b85decode({payload}[::-1]))))),globals())
 except Exception as {string}:
     print({string})
 except KeyboardInterrupt:pass"""
