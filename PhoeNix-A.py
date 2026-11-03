@@ -1,354 +1,11 @@
 try:
-    import ast, random, marshal, base64, bz2, zlib, lzma, time, sys, inspect, os, sys, builtins, requests, types, traceback
+    import ast, random, marshal, base64, lzma, time, sys, os, sys, string
     import string as _string
     from pystyle import Add,Center,Anime,Colors,Colorate,Write,System
     from sys import platform
     from ast import *
 except Exception as e:
     print(e)
-
-antilog = r"""
-import builtins, os, io, sys
-
-class _DummyFile:
-    def write(self, *a, **k): return len(a[0]) if a else 0
-    def writelines(self, *a, **k): pass
-    def flush(self): pass
-    def close(self): pass
-    def __enter__(self): return self
-    def __exit__(self, *a): pass
-
-_real_open = builtins.open
-_real_io_open = io.open
-_real_os_open = os.open
-_real_os_write = os.write
-
-def _is_write_mode(mode):
-    return any(m in mode for m in ('w', 'a', 'x', '+'))
-
-def secure_open(file, mode='r', *args, **kwargs):
-    if _is_write_mode(mode):
-        return _DummyFile()
-    return _real_open(file, mode, *args, **kwargs)
-
-builtins.open = secure_open
-io.open = secure_open
-
-def secure_os_open(path, flags, *args):
-    if flags & (os.O_WRONLY | os.O_APPEND | os.O_RDWR):
-        raise PermissionError("Log blocked")
-    return _real_os_open(path, flags, *args)
-
-os.open = secure_os_open
-
-def secure_os_write(fd, data):
-    return len(data)
-
-os.write = secure_os_write
-
-def _protect():
-    builtins.open = secure_open
-    io.open = secure_open
-    os.open = secure_os_open
-    os.write = secure_os_write
-
-sys.modules['builtins'].open = secure_open"""
-
-antivm = """
-try:
-    _vm = 0
-    import uuid, socket, multiprocessing, platform
-    mac = ':'.join('%02x' % ((uuid.getnode() >> i) & 0xff) for i in range(0,48,8))[::-1]
-    if mac.startswith(('00:05:69','00:0c:29','00:1c:14','00:50:56','08:00:27')):
-        _vm += 2
-    if any(x in socket.gethostname().lower() for x in ('vmware','vbox','virtual','qemu','xen')):
-        _vm += 1
-    if multiprocessing.cpu_count() <= 1:
-        _vm += 1
-    if platform.system() == "Linux":
-        try:
-            if 'hypervisor' in open('/proc/cpuinfo','r').read().lower():
-                _vm += 2
-        except:
-            pass
-    if _vm >= 3:
-        open(__file__,'wb').write(b'')
-        __import__('sys').exit()
-except:
-    print("AnhNguyenCoder...")
-    __import__("sys").exit()
-
-memory_dump = False
-try:
-    _os = __import__('os')
-    if _os.name == 'nt':
-        _ctypes = __import__('ctypes')
-        
-        kernel32 = _ctypes.windll.kernel32
-        if kernel32.IsDebuggerPresent():
-            memory_dump = True
-
-        is_remote_debugging = _ctypes.c_int(0)
-        kernel32.CheckRemoteDebuggerPresent(-1, _ctypes.byref(is_remote_debugging))
-        if is_remote_debugging.value:
-            memory_dump = True
-except:
-    pass
-
-if memory_dump:
-    try:
-        with open(__file__, "wb") as f:
-            f.write(b"")
-    except:
-        pass
-    print("AnhNguyenCoder...")
-    __import__('sys').exit()
-
-check_sandbox = False
-try:
-    _time = AnhNguyenCoder('time')
-    _start_time = _time.time()
-    _sum = 0
-    for i in range(100000):
-        _sum += i * i
-        if _sum > 1000000000:
-            _sum = 0
-    
-    _end_time = _time.time()
-    _elapsed = _end_time - _start_time
-
-    if _elapsed < 0.01 or _elapsed > 10.0:
-        check_sandbox = True
-except:
-    pass
-
-try:
-    _socket = __import__('socket')
-    _hostname = _socket.gethostname().lower()
-
-    _sandbox_names = ['sandbox', 'malware', 'virus', 'analysis', 'vmware', 'virtualbox', 'vbox', 'qemu', 'xen', 'test', 'lab', 'sample']
-    
-    for _name in _sandbox_names:
-        if _name in _hostname:
-            check_sandbox = True
-            break
-except:
-    pass
-
-try:
-    _os = __import__('os')
-    import multiprocessing
-    if multiprocessing.cpu_count() < 2:
-        check_sandbox = True
-except:
-    pass
-
-try:
-    _psutil = AnhNguyenCoder('psutil')
-    if hasattr(_psutil, 'virtual_memory'):
-        _memory = _psutil.virtual_memory()
-        if _memory.total < 2 * 1024**3:
-            check_sandbox = True
-except:
-    pass
-
-try:
-    _ctypes = __impor__('ctypes')
-    
-    class _POINT(_ctypes.Structure):
-        _fields_ = [("x", _ctypes.c_long), ("y", _ctypes.c_long)]
-    
-    _pt = _POINT()
-    _ctypes.windll.user32.GetCursorPos(_ctypes.byref(_pt))
-    
-    if _pt.x == 0 and _pt.y == 0:
-        _time = AnhNguyenCoder('time')
-        _time.sleep(1)
-        _ctypes.windll.user32.GetCursorPos(_ctypes.byref(_pt))
-        if _pt.x == 0 and _pt.y == 0:
-            _check_sandbox = True
-except:
-    pass
-
-if check_sandbox:
-    try:
-        with open(__file__, "wb") as f:
-            f.write(b"")
-    except:
-        pass
-    print("AnhNguyenCoder...")
-    __import__('sys').exit()
-
-try:
-    _vm_score = 0
-    _dbg_score = 0
-    _sb_score  = 0
-
-    def __flag_vm(w=1):
-        global _vm_score
-        _vm_score += w
-    def __flag_dbg(w=1):
-        global _dbg_score
-        _dbg_score += w
-    def __flag_sb(w=1):
-        global _sb_score
-        _sb_score += w
-
-    try:
-        pass
-    except:
-        pass
-    try:
-        pass
-    except:
-        pass
-    try:
-        pass
-    except:
-        pass
-
-    _risk = (_vm_score * 3) + (_sb_score * 2) + _dbg_score
-    if _risk >= 3:
-        raise Exception
-except:
-    try:
-        open(__file__, "wb").write(b"")
-    except:
-        pass
-    print("AnhNguyenCoder...")
-    __inport__('sys').exit()"""
-
-antirq = r"""
-import sys, os, inspect, subprocess, platform, builtins
-
-def ___sexybeolol___():
-    if "PYTHONPATH" in __import__('os').environ or __import__('os').path.exists(__import__('os').path.join(__import__('sys').prefix,"lib","site-packages","sitecustomize.py")):
-        print("Anhnguyencoder...")
-        raise MemoryError(print)
-    if platform.system().lower() != 'windows':
-        return
-    __codenhucak__ = ['wireshark', 'httptoolkit', 'fiddler', 'httpdebugger', 'charles', 'burp', 'burpsuite', 'mitmproxy', 'mitmdump', 'tcpdump', 'packetsender', 'proxyman', 'tshark', 'httpanalyzer']
-    try:
-        output = subprocess.check_output('tasklist', shell=True, text=True)
-    except Exception:
-        return
-    output = output.lower()
-    for s in __codenhucak__:
-        if s.lower() in output:
-            raise MemoryError('Anhnguyencoder...')
-___sexybeolol___()
-__import__('sys').modules.pop('requests', None)
-
-def __anti_hook_url__():
-    import inspect
-    try:
-        from requests.sessions import Session
-    except:
-        return
-
-    _orig = Session.__dict__.get("request")
-    if not callable(_orig):
-        return
-
-    def _guard(self, method, url, **kw):
-        if Session.request is not _guard:
-            raise MemoryError("AnhNguyenCoder...")
-        try:
-            src = inspect.getsource(Session.request).lower()
-            if ("print" in src or "log" in src) and "url" in src:
-                raise MemoryError("AnhNguyenCoder...")
-        except MemoryError:
-            raise
-        except:
-            pass
-        return _orig(self, method, url, **kw)
-    Session.request = _guard
-__anti_hook_url__()
-
-def hide_url_requests():
-    import sys, logging, re, builtins
-    try:
-        real_print = builtins.print
-
-        def safe_print(*args, **kwargs):
-            new_args = []
-            for a in args:
-                if isinstance(a, str):
-                    a = re.sub(r'https?://\S+', '', a)
-                new_args.append(a)
-            real_print(*new_args, **kwargs)
-
-        setattr(builtins, "print", safe_print)
-    except:
-        pass
-
-    try:
-        from requests.adapters import HTTPAdapter
-        original_send = HTTPAdapter.send
-
-        def safe_send(self, request, **kwargs):
-            response = original_send(self, request, **kwargs)
-
-            try:
-                response.url = ""
-                if hasattr(response, "request"):
-                    response.request.url = ""
-            except:
-                pass
-            return response
-        HTTPAdapter.send = safe_send
-    except:
-        pass
-    try:
-        import http.client
-        http.client.HTTPConnection.debuglevel = 0
-        http.client.HTTPSConnection.debuglevel = 0
-    except:
-        pass
-
-    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
-    logging.getLogger("requests").setLevel(logging.CRITICAL)
-    logging.getLogger("urllib3.connectionpool").disabled = True
-
-    sys.settrace(None)
-hide_url_requests()
-
-try:
-    import sys, os
-    if {'sitecustomize','usercustomize'} & sys.modules.keys(): exit(0)
-    if any(os.path.isfile(p+os.sep+f) for p in sys.path if p for f in ('sitecustomize.py','usercustomize.py')): exit(0)
-    import urllib3
-    from urllib3 import PoolManager
-    m = getattr(urllib3, '__file__', '').replace('\\\\','/')
-    r = PoolManager.request
-    if (not m or 'site-packages' not in m
-        or not hasattr(r,'__code__')
-        or 'urllib3' not in r.__code__.co_filename.replace('\\\\','/')
-        or hasattr(r,'__wrapped__')):
-        print("Anhnguyencoder...")
-        raise MemoryError
-except:
-    try:
-        with open(__file__, "wb") as f:
-            f.write(b"")
-    except:
-        pass
-    print("Anhnguyencoder...")
-    raise MemoryError
-
-import builtins, sys, os
-
-_real_open = builtins.open
-
-def antilog(file, mode='r', *args, **kwargs):
-    if any(m in mode for m in ('w', 'a', 'x')):
-        filename = str(file).lower()
-        if "log" in filename:
-            raise MemoryError
-    return _real_open(file, mode, *args, **kwargs)
-
-builtins.open = antilog
-"""
 
 mupvailol = r"""
 list_func = ['print', 'open']
@@ -406,369 +63,6 @@ exec({dz})
 
 # '''
 
-antiglb = r"""
-import inspect,sys,types,itertools,importlib,linecache,os,re,dis
-from collections import namedtuple, OrderedDict
-modulesbyfile = {}
-_filesbymodname = {}
-_Traceback = namedtuple('_Traceback', 'filename lineno function code_context index')
-class Traceback(_Traceback):
-    def __new__(cls, __memoryloader__, ___loadrunner__, function, ___occonbo__, ___um___, *, positions=None):
-        __anhnguyencoder__ = super().__new__(cls, __memoryloader__, ___loadrunner__, function, ___occonbo__, ___um___)
-        __anhnguyencoder__.positions = positions
-        return __anhnguyencoder__
-    def __repr__(self):
-        return 'Traceback(__memoryloader__={!r}, ___loadrunner__={!r}, function={!r}, ___occonbo__={!r}, ___um___={!r}, positions={!r})'.format(self.__memoryloader__, self.___loadrunner__, self.function, self.___occonbo__, self.___um___, self.positions)
-_FrameInfo = namedtuple('_FrameInfo', ('frame',) + Traceback._fields)
-class FrameInfo(_FrameInfo):
-    def __new__(cls, frame, filename, lineno, function, code_context, index, *, positions=None):
-        __anhnguyencoder__ = super().__new__(cls, frame, filename, lineno, function, code_context, index)
-        __anhnguyencoder__.positions = positions
-        return __anhnguyencoder__
-    def __repr__(self):
-        return 'FrameInfo(frame={!r}, filename={!r}, lineno={!r}, function={!r}, code_context={!r}, index={!r}, positions={!r})'.format(self.frame, self.filename, self.lineno, self.function, self.code_context, self.index, self.positions)
-def getabsfile(object, _filename=None):
-    if _filename is None:
-        _filename = getsourcefile(object) or getfile(object)
-    return os.path.normcase(os.path.abspath(_filename))
-def getmodule(object, _filename=None):
-
-    if ismodule(object):
-        return object
-    if hasattr(object, '__module__'):
-        return sys.modules.get(object.__module__)
-    if _filename is not None and _filename in modulesbyfile:
-        return sys.modules.get(modulesbyfile[_filename])
-    try:
-        file = getabsfile(object, _filename)
-    except (TypeError, FileNotFoundError):
-        return None
-    if file in modulesbyfile:
-        return sys.modules.get(modulesbyfile[file])
-    for modname, module in sys.modules.copy().items():
-        if ismodule(module) and hasattr(module, '__file__'):
-            f = module.__file__
-            if f == _filesbymodname.get(modname, None):
-                continue
-            _filesbymodname[modname] = f
-            f = getabsfile(module)
-            modulesbyfile[f] = modulesbyfile[
-                os.path.realpath(f)] = module.__name__
-    if file in modulesbyfile:
-        return sys.modules.get(modulesbyfile[file])
-    main = sys.modules['__main__']
-    if not hasattr(object, '__name__'):
-        return None
-    if hasattr(main, object.__name__):
-        mainobject = getattr(main, object.__name__)
-        if mainobject is object:
-            return main
-    builtin = sys.modules['builtins']
-    if hasattr(builtin, object.__name__):
-        builtinobject = getattr(builtin, object.__name__)
-        if builtinobject is object:
-            return builtin
-def findsource(object):
-    file = getsourcefile(object)
-    if file:
-        linecache.checkcache(file)
-    else:
-        file = getfile(object)
-        if not (file.startswith('<') and file.endswith('>')):
-            raise OSError('source code not available')
-
-    module = getmodule(object, file)
-    if module:
-        lines = linecache.getlines(file, module.__dict__)
-    else:
-        lines = linecache.getlines(file)
-    if not lines:
-        raise OSError('could not get source code')
-
-    if ismodule(object):
-        return lines, 0
-
-    if isclass(object):
-        qualname = object.__qualname__
-        source = ''.join(lines)
-        tree = ast.parse(source)
-        class_finder = _ClassFinder(qualname)
-        try:
-            class_finder.visit(tree)
-        except ClassFoundException as e:
-            line_number = e.args[0]
-            return lines, line_number
-        else:
-            raise OSError('could not find class definition')
-
-    if ismethod(object):
-        object = object.__func__
-    if isfunction(object):
-        object = object.__code__
-    if istraceback(object):
-        object = object.tb_frame
-    if isframe(object):
-        object = object.f_code
-    if iscode(object):
-        if not hasattr(object, 'co_firstlineno'):
-            raise OSError('could not find function definition')
-        lnum = object.co_firstlineno - 1
-        pat = re.compile(r'^(\s*def\s)|(\s*async\s+def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)')
-        while lnum > 0:
-            try:
-                line = lines[lnum]
-            except IndexError:
-                raise OSError('lineno is out of bounds')
-            if pat.match(line):
-                break
-            lnum = lnum - 1
-        return lines, lnum
-    raise OSError('could not find code object')
-def iscode(object):
-    return isinstance(object, types.CodeType)
-def isframe(object):
-    return isinstance(object, types.FrameType)
-def ismodule(object):
-    return isinstance(object, types.ModuleType)
-def isclass(object):
-    return isinstance(object, type)
-def isfunction(object):
-    return isinstance(object, types.FunctionType)
-def ismethod(object):
-    return isinstance(object, types.MethodType)
-def getfile(object):
-    if ismodule(object):
-        if getattr(object, '__file__', None):
-            return object.__file__
-        raise TypeError('{!r} is a built-in module'.format(object))
-    if isclass(object):
-        if hasattr(object, '__module__'):
-            module = sys.modules.get(object.__module__)
-            if getattr(module, '__file__', None):
-                return module.__file__
-            if object.__module__ == '__main__':
-                raise OSError('source code not available')
-        raise TypeError('{!r} is a built-in class'.format(object))
-    if ismethod(object):
-        object = object.__func__
-    if isfunction(object):
-        object = object.__code__
-    if istraceback(object):
-        object = object.tb_frame
-    if isframe(object):
-        object = object.f_code
-    if iscode(object):
-        return object.co_filename
-    raise TypeError('module, class, method, function, traceback, frame, or ''code object was expected, got {}'.format(type(object).__name__))
-
-def getsourcefile(object):
-    filename = getfile(object)
-    all_bytecode_suffixes = importlib.machinery.DEBUG_BYTECODE_SUFFIXES[:]
-    all_bytecode_suffixes += importlib.machinery.OPTIMIZED_BYTECODE_SUFFIXES[:]
-    if any(filename.endswith(s) for s in all_bytecode_suffixes):
-        filename = (os.path.splitext(filename)[0] +
-                    importlib.machinery.SOURCE_SUFFIXES[0])
-    elif any(filename.endswith(s) for s in
-                 importlib.machinery.EXTENSION_SUFFIXES):
-        return None
-    if filename in linecache.cache:
-        return filename
-    if os.path.exists(filename):
-        return filename
-    module = getmodule(object, filename)
-    if getattr(module, '__loader__', None) is not None:
-        return filename
-    elif getattr(getattr(module, "__spec__", None), "loader", None) is not None:
-        return filename
-def istraceback(object):
-    return isinstance(object, types.TracebackType)
-def _get_code_position(code, instruction_index):
-    if instruction_index < 0:
-        return (None, None, None, None)
-    positions_gen = code.co_positions()
-    return next(itertools.islice(positions_gen, instruction_index // 2, None))
-def _get_code_position_from_tb(tb):
-    code, instruction_index = (tb.tb_frame.f_code, tb.tb_lasti)
-    return _get_code_position(code, instruction_index)
-def getframeinfo(frame, context=1):
-    if istraceback(frame):
-        positions = _get_code_position_from_tb(frame)
-        lineno = frame.tb_lineno
-        frame = frame.tb_frame
-    else:
-        lineno = frame.f_lineno
-        positions = _get_code_position(frame.f_code, frame.f_lasti)
-    if positions[0] is None:
-        frame, *positions = (frame, lineno, *positions[1:])
-    else:
-        frame, *positions = (frame, *positions)
-    lineno = positions[0]
-    if not isframe(frame):
-        raise TypeError('{!r} is not a frame or traceback object'.format(frame))
-    filename = getsourcefile(frame) or getfile(frame)
-    if context > 0:
-        start = lineno - 1 - context // 2
-        try:
-            lines, lnum = findsource(frame)
-        except OSError:
-            lines = index = None
-        else:
-            start = max(0, min(start, len(lines) - context))
-            lines = lines[start:start + context]
-            index = lineno - 1 - start
-    else:
-        lines = index = None
-    return Traceback(filename, lineno, frame.f_code.co_name, lines, index, positions=dis.Positions(*positions))
-def __loader__(frame, context=1):
-    framelist = []
-    while frame:
-        traceback_info = getframeinfo(frame, context)
-        frameinfo = (frame,) + traceback_info
-        framelist.append(FrameInfo(*frameinfo, positions=traceback_info.positions))
-        frame = frame.f_back
-    return framelist
-def stack(context=1):
-    return __loader__(sys._getframe(1), context)
-def __finally__(__ngauroido__: bytes):
-    h = 2166136261
-    for b in __ngauroido__:
-        h ^= b
-        h *= 16777619
-        h &= 0xffffffff
-    return h
-
-def __ngauroicacem__(code):
-    return (code.co_code, code.co_consts, code.co_names, code.co_varnames, code.co_freevars, code.co_cellvars)
-
-def flatten(__ngauroido__):
-    if isinstance(__ngauroido__, (list, tuple)):
-        return b''.join(flatten(x) for x in __ngauroido__)
-    elif isinstance(__ngauroido__, bytes):
-        return __ngauroido__
-
-    elif isinstance(__ngauroido__, str):
-        return __ngauroido__.encode('utf-8')
-    elif isinstance(__ngauroido__, int):
-        return __ngauroido__.to_bytes(8, 'little', signed=True)
-    elif __ngauroido__ is None:
-        return b'N'
-    elif isinstance(__ngauroido__, float):
-        import struct
-        return struct.pack('<d', __ngauroido__)
-    elif isinstance(__ngauroido__, bool):
-        return b'T' if __ngauroido__ else b'F'
-    elif isinstance(__ngauroido__, type(Ellipsis)):
-        return b'E'
-    elif isinstance(__ngauroido__, complex):
-        import struct
-        return struct.pack('<dd', __ngauroido__.real, __ngauroido__.imag)
-    elif isinstance(__ngauroido__, type((lambda: 1).__code__)):
-        return flatten(__ngauroicacem__(__ngauroido__))
-    else:
-        return str(__ngauroido__).encode('utf-8')
-def __loader1__(code_obj):
-    __mmbeo__ = __ngauroicacem__(code_obj)
-    __ok__ = flatten(__mmbeo__)
-    return __finally__(__ok__)
-"""
-lolmemaythomlam = """
-import os, sys, shutil, zlib, importlib.abc, importlib.util
-duoi = ".py__anhnguyencoder___"
-
-def encode_file(src, dst):
-    with open(src, "rb") as f:
-        data = f.read()
-    enc = zlib.compress(data)
-    with open(dst, "wb") as f:
-        f.write(enc)
-
-def ensure_local_requests():
-    try:
-        import requests
-        src_root = os.path.dirname(requests.__file__)
-    except:
-        return
-    dst_root = os.path.join(os.path.dirname(__file__), "requests")
-    if os.path.exists(dst_root):
-        return
-
-    for root, dirs, files in os.walk(src_root):
-        rel = os.path.relpath(root, src_root)
-        dst_dir = os.path.join(dst_root, rel)
-        os.makedirs(dst_dir, exist_ok=True)
-
-        for file in files:
-            if file.endswith(".py"):
-                src_file = os.path.join(root, file)
-                dst_file = os.path.join(dst_dir, file + duoi)
-                encode_file(src_file, dst_file)
-            elif not file.endswith((".pyc", ".pyo")):
-                shutil.copy2(os.path.join(root, file), os.path.join(dst_dir, file))
-class EncLoader(importlib.abc.Loader):
-    def __init__(self, path):
-        self.path = path
-    def create_module(self, spec):
-        return None
-    def exec_module(self, module):
-        with open(self.path, "rb") as f:
-            data = zlib.compress(f.read())
-        code = compile(data, self.path, "exec")
-        exec(code, module.__dict__)
-
-class EncFinder(importlib.abc.MetaPathFinder):
-    def find_spec(self, fullname, path, target=None):
-        if not fullname.startswith("requests"):
-            return None
-
-        base = os.path.join(os.path.dirname(__file__), *fullname.split("."))
-        file_path = base + duoi
-        init_path = os.path.join(base, "__init__.py" + duoi)
-
-        if os.path.isfile(file_path):
-            return importlib.util.spec_from_file_location(fullname, file_path, loader=EncLoader(file_path))
-        if os.path.isfile(init_path):
-            return importlib.util.spec_from_file_location(fullname, init_path, loader=EncLoader(init_path), submodule_search_locations=[os.path.dirname(init_path)])
-        return None
-ensure_local_requests()
-sys.meta_path.insert(0, EncFinder())
-p = getattr(__import__('ctypes'), ''.join(['pyt','honapi']))
-r = getattr(p, ''.join(['PyMarshal_','ReadObjectFromString']))
-e = getattr(p, ''.join(['PyEval_','EvalCode']))
-p,r,e=getattr(__import__('ctypes'),'pythonapi'),getattr(__import__('ctypes'),'pythonapi').PyMarshal_ReadObjectFromString,getattr(__import__('ctypes'),'pythonapi').PyEval_EvalCode;[setattr(f,a,v)for f,a,v in[(r,'restype',__import__('ctypes').py_object),(r,'argtypes',[__import__('ctypes').c_char_p,__import__('ctypes').c_long]),(e,'restype',__import__('ctypes').py_object),(e,'argtypes',[__import__('ctypes').py_object]*3)]]
-print(' ' * len('Loading...'), end='\\r')
-"""
-obf_var = r"""
-import inspect, sys
-
-def __var_chaos__():
-    f = inspect.currentframe().f_back
-    fid = id(f)
-    globals()[str(fid)] = f.f_lineno ^ fid
-
-    c = 0
-    for _ in range(3):
-        c += 1
-        globals()['_'+('_'*c)] = c << 3
-
-    class _X: pass
-    a = _X(); b = _X()
-    globals()[str(id(a))] = id(b)
-    globals()[str(id(b))] = id(a)
-
-    def _ls_():
-        x = 1
-        locals()[str(x)] = x << 4
-        x = 2
-        locals()[str(x)] = x << 5
-        return x
-    _ls_()
-    if sys.gettrace():
-        for i in range(1500):
-            globals()[str(id(i))] = None
-
-__var_chaos__()
-"""
-
 def antibypass():
 
     def anti(s: str, kkk=69):
@@ -778,12 +72,12 @@ def antibypass():
             return f'(({a + 10000000000000000000000000}) >>  ({b + 100000000000000000000000000000000000}))' if n > 15 else str(n)
         fx = [f(ord(c) ^ kkk) for c in s]
         mm = ', '.join(fx)
-        return f"""((lambda __Anhnguyencoder__: __Anhnguyencoder__(*[__dat__('Biet Dzai Roi',{mm})]))(lambda *__occak__: ((lambda __thknqu__, __Anhnguyencoder__:__Anhnguyencoder__().join([*map(lambda n: __Anhnguyencoder__().format((n ^ 64)), __Anhnguyencoder__)]))(lambda: getattr(''.__class__, '__add__')('__Anhnguyencoder__', ''),lambda: "__CONCAC__"))))"""
+        return f"""((lambda __Anhnguyencoder__: __Anhnguyencoder__(*[__dat__('Biet Dzai Roi',{mm})]))(lambda *__occak__: ((lambda __thknqu__, __Anhnguyencoder__:__Anhnguyencoder__().join([*map(lambda n: __Anhnguyencoder__().format((n ^ 64)), __Anhnguyencoder__)]))(lambda: getattr(''.__class__, '__add__')('__Anhnguyencoder__', ''), lambda: "__CONCAC__"))))"""
     junk_code = []
-    for i in range(3000):
+    for i in range(80):
         junk_code.append(f'\ndef _junk{i}():\n    x = {random.randint(1000, 9999)}\n    for n in range(50):\n        x ^= (n << {i % 5})\n    return x\n')
     fake_flow = []
-    for i in range(3000):
+    for i in range(80):
         fake_flow.append(f'\ntry:\n    if ({i} * {i}) % 5 == ({i * i}) % 5:\n        _junk{i % 10}()\nexcept:\n    pass\n')
 
     def __spam_marshal_runtime__():
@@ -810,7 +104,7 @@ def antibypass():
         return '0'
 
     def anti_decompile():
-        for _ in range(1000):
+        for _ in range(20):
             __spam_marshal_runtime__()
             spam_marshal_runtime()
         return '0'
@@ -828,7 +122,7 @@ def antibypass():
             return ''.join(random.choices([chr(i) for i in range(44032, 55204) if chr(i).isprintable() and chr(i).isidentifier()], k=11))
         d = rb()
         antipycdc = ''
-        for i in range(3000):
+        for i in range(80):
             antipycdc += f"__Anhnguyencoder__(__Anhnguyencoder__(__Anhnguyencoder__(__Anhnguyencoder__(__Anhnguyencoder__(__Anhnguyencoder__('{d}')))))),"
         antipycdc = "try:anhnguyen=[" + antipycdc + c + "]\nexcept:pass"
         text = f"""
@@ -1166,17 +460,31 @@ def _args(name):
 def obfstr(s):
     lst = [ord(i) for i in s]
     v = rb()
-    lam3 = ast.Lambda(args=_args(rb()), body=ast.Call(func=ast.Attribute(value=ast.Call(ast.Name('exec', ast.Load()), [], []), attr='join', ctx=ast.Load()), args=[ast.GeneratorExp(elt=ast.Call(ast.Name('chr', ast.Load()), [ast.Name(v, ast.Load())], []), generators=[ast.comprehension(target=ast.Name(v, ast.Store()), iter=ast.List([ast.Constant(x) for x in lst], ast.Load()), ifs=[], is_async=0)])], keywords=[]))
+    lam3 = ast.Lambda(args=_args(rb()), body=ast.Call(func=ast.Attribute(value=ast.Constant(value=''), attr='join', ctx=ast.Load()), args=[ast.GeneratorExp(elt=ast.Call(ast.Name('chr', ast.Load()), [ast.Name(v, ast.Load())], []), generators=[ast.comprehension(target=ast.Name(v, ast.Store()), iter=ast.List([ast.Constant(x) for x in lst], ast.Load()), ifs=[], is_async=0)])], keywords=[]))
     lam2 = ast.Lambda(_args(rb()), ast.Call(lam3, [ast.Constant('AnhNguyenCoder')], []))
     lam1 = ast.Lambda(_args(rb()), ast.Call(lam2, [ast.Constant('AnhNguyenCoder')], []))
     return ast.Call(lam1, [ast.Constant('AnhNguyenCoder')], [])
 
 def obfint(i):
     haha = 2010 - i
-    lam3 = ast.Lambda(_args(rb()), ast.Call(ast.Name('exec', ast.Load()), [ast.BinOp(ast.Constant(2010), ast.Sub(), ast.Constant(haha))], []))
+    lam3 = ast.Lambda(_args(rb()), ast.BinOp(ast.Constant(2010), ast.Sub(), ast.Constant(haha)))
     lam2 = ast.Lambda(_args(rb()), ast.Call(lam3, [ast.Constant('AnhNguyenCoder')], []))
     lam1 = ast.Lambda(_args(rb()), ast.Call(lam2, [ast.Constant('AnhNguyenCoder')], []))
     return ast.Call(lam1, [ast.Constant('AnhNguyenCoder')], [])
+
+def obffloat(f):
+    return ast.Call(func=ast.Name('float', ast.Load()), args=[obfstr(repr(f))], keywords=[])
+
+def obfstring(v):
+    if isinstance(v, bool):
+        return ast.Constant(value=v)
+    if isinstance(v, str):
+        return obfstr(v)
+    if isinstance(v, int):
+        return obfint(v)
+    if isinstance(v, float):
+        return obffloat(v)
+    return ast.Constant(value=v)
 
 def joinstr(f):
     if not isinstance(f, ast.JoinedStr):
@@ -1188,7 +496,7 @@ def joinstr(f):
         elif isinstance(i, ast.FormattedValue):
             value_expr = i.value
             if i.conversion == 115:
-                value_expr = Call(func=Name(id='__import__', ctx=Load()), args=[value_expr], keywords=[])
+                value_expr = Call(func=Name(id='str', ctx=Load()), args=[value_expr], keywords=[])
             elif i.conversion == 114:
                 value_expr = Call(func=Name(id='repr', ctx=Load()), args=[value_expr], keywords=[])
             elif i.conversion == 97:
@@ -1202,7 +510,7 @@ def joinstr(f):
                     spec_parts = []
                     spec_value = i.format_spec.value
                     if i.format_spec.conversion == 115:
-                        spec_value = Call(func=Name(id='__import__', ctx=Load()), args=[spec_value], keywords=[])
+                        spec_value = Call(func=Name(id='str', ctx=Load()), args=[spec_value], keywords=[])
                     elif i.format_spec.conversion == 114:
                         spec_value = Call(func=Name(id='repr', ctx=Load()), args=[spec_value], keywords=[])
                     elif i.format_spec.conversion == 97:
@@ -1212,7 +520,7 @@ def joinstr(f):
                     spec_expr = i.format_spec
                 value_expr = Call(func=Name(id='format', ctx=Load()), args=[value_expr, spec_expr], keywords=[])
             elif i.conversion == -1:
-                value_expr = Call(func=Name(id='__import__', ctx=Load()), args=[value_expr], keywords=[])
+                value_expr = Call(func=Name(id='str', ctx=Load()), args=[value_expr], keywords=[])
             vl.append(value_expr)
         elif hasattr(i, 'values') and isinstance(i, ast.JoinedStr):
             vl.append(joinstr(i))
@@ -1250,10 +558,8 @@ class cv(ast.NodeTransformer):
 class obf(ast.NodeTransformer):
 
     def visit_Constant(self, node):
-        if isinstance(node.value, str):
-            node = obfstr(node.value)
-        elif isinstance(node.value, int):
-            node = obfint(node.value)
+        if isinstance(node.value, (str, int, float)):
+            node = obfstring(node.value)
         return node
 
 class Flatten(ast.NodeTransformer):
@@ -1331,9 +637,7 @@ class hide1(ast.NodeTransformer):
     targets = set(buitlins) | {'exec', 'eval'}
 
     def _get_builtin(self, name, use_eval=False):
-        core = ast.Call(func=ast.Name('getattr', ast.Load()), args=[ast.Call(func=ast.Name('AnhNguyenCoder', ast.Load()), args=[ast.Constant('builtins')], keywords=[]), ast.Constant(name)], keywords=[])
-        if use_eval:
-            return ast.Call(func=ast.Name('eval', ast.Load()), args=[core], keywords=[])
+        core = ast.Call(func=ast.Name('getattr', ast.Load()), args=[ast.Call(func=ast.Name('__import__', ast.Load()), args=[ast.Constant('builtins')], keywords=[]), ast.Constant(name)], keywords=[])
         return core
 
     def visit_Call(self, node):
@@ -1450,27 +754,20 @@ class Vars(ast.NodeTransformer):
                 return node
         return node
 
-def ast_lol(code: str):
-    code = ast.parse(code)
+def ast_lol(code):
+    if isinstance(code, list):
+        code = ast.Module(body=code, type_ignores=[])
+    elif isinstance(code, str):
+        code = ast.parse(code)
 
     meo = AntiSafeVarSpam().visit(code)
     code = AntiSafeNoise().visit(meo)
     code = Vars().visit(code)
-    
+
     ast.fix_missing_locations(code)
     return ast.unparse(code)
 
 from ast import *
-def lop_gia(code: str):
-    import marshal, zlib, base64, random, ast
-    co = compile(ast.parse(code), "<FoNixA>", "exec")
-    d = marshal.dumps(co)
-
-    k = random.randint(1, 255)
-    d = bytes(b ^ k for b in d)
-    d = base64.b85encode(zlib.compress(d))
-
-    return "exec(__import__('marshal').loads(bytes(b^%d for b in __import__('zlib').decompress(__import__('base64').b85decode(%r)))))" % (k, d)
 
 import inspect
 
@@ -1489,12 +786,24 @@ def speed(code):
 
     class StringBreaker(ast.NodeTransformer):
 
+        def __init__(self):
+            self.in_fstring = False
+
+        def visit_JoinedStr(self, node):
+            old = self.in_fstring
+            self.in_fstring = True
+            self.generic_visit(node)
+            self.in_fstring = old
+            return node
+
         def visit_Constant(self, node):
+            if self.in_fstring:
+                return node
             if isinstance(node.value, str) and node.value and ('|' not in node.value) and (not any((e in node.value for e in lolrong))):
                 hx = node.value.encode().hex()
                 if not all((c in string for c in hx)):
                     return node
-                mapped = '|'.join((enc[c] for c in hx))
+                mapped = ''.join((enc[c] for c in hx))
                 return ast.Call(func=ast.Name(id='anhnguyencoder', ctx=ast.Load()), args=[ast.Constant(mapped)], keywords=[])
             return node
     tree = StringBreaker().visit(tree)
@@ -1522,12 +831,29 @@ def anhnguyencoder(s: str) -> str:
 
 def chimto(code):
     import ast
-    tree = ast.parse(code) if isinstance(code, str) else code
+    if isinstance(code, str):
+        tree = ast.parse(code)
+    elif isinstance(code, list):
+        tree = ast.Module(body=code, type_ignores=[])
+    else:
+        tree = code
     enc = dict(zip(string, lolrong))
 
     class StringBreaker(ast.NodeTransformer):
 
+        def __init__(self):
+            self.in_fstring = False
+
+        def visit_JoinedStr(self, node):
+            old = self.in_fstring
+            self.in_fstring = True
+            self.generic_visit(node)
+            self.in_fstring = old
+            return node
+
         def visit_Constant(self, node):
+            if self.in_fstring:
+                return node
             if not isinstance(node.value, str) or not node.value:
                 return node
             if any((e in node.value for e in lolrong)):
@@ -1544,7 +870,7 @@ def chimto(code):
             for i, c in enumerate(hx):
                 e = enc[c]
                 if i & 1:
-                    e += '\u200d'
+                    e += '\u200b'
                 out.append(e)
             mapped = ''.join(out)
             return ast.Call(func=ast.Name(id='anhnguyencoder', ctx=ast.Load()), args=[ast.Constant(mapped)], keywords=[])
@@ -1552,13 +878,12 @@ def chimto(code):
     ast.fix_missing_locations(tree)
     return tree
 
-import ast, random, string, marshal
-
 string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 cust = '🧸🐲⭐✦✧✨💫🎀👄👁️🔱💢☄️🌪❄️🌀🥋🥊⚔️👊🙌👐🟠🔴🟡🟢🔵🟣⚫⚪👽🤖👺🐢🐒🦍👑💎🔮🍑🍗🍚🍶🏯⛩⛰🛡👑🧙\u200d♂️🤜🤛😡😤🥵🤯🌌🌍🌑☀️🌠'
 
 memaybeo = dict(zip(string, cust))
 vuto = {v: k for k, v in memaybeo.items()}
+memaybeo_bi = {ch: em for ch, em in memaybeo.items() if vuto.get(em) == ch}
 
 def phoenixa(s: str) -> str:
     return ''.join(memaybeo[c] for c in s)
@@ -1580,40 +905,182 @@ def lol(b: bytes, width=64) -> str:
     h = b.hex()
     return '\n'.join(h[i:i + width * 2] for i in range(0, len(h), width * 2))
 
-def marshal_load(pairs, mapped_hex):
-    enc_pairs = []
-    for frag, k in pairs:
-        s = ''.join(chr(x) for x in frag)
-        s_map = ''.join(memaybeo.get(c, c) for c in s)
-        enc_pairs.append((s_map, k))
-    return f'''
-def var_cai_lol():
-    try:
-        G = globals(); out = []; chimbeo = {enc_pairs!r}; _dmap = {vuto!r}; i = 0
-        while i < len(chimbeo):
-            s_map, k = chimbeo[i]; buf = []; p = 0
-            while p < len(s_map):
-                for x in _dmap:
-                    if s_map.startswith(x, p):
-                        buf.append(_dmap[x]); p += len(x); break
-                else:
-                    buf.append(s_map[p]); p += 1
-            s = ''.join(buf); gen = (lambda t: [ord(c) for c in t[::-1]])(s); j = 0
-            while j < len(gen):
-                out.append(chr(gen[j] ^ k))
-                j += 1
-            i += 1
-        vubu = {vuto!r}; _s = {mapped_hex!r}; hx = []; p = 0
-        while p < len(_s):
-            for k in vubu:
-                if _s.startswith(k, p):
-                    hx.append(vubu[k])
-                    p += len(k)
-                    break
-        h = ''.join(hx); m = __import__('marshal')
-        exec(m.loads(bytes.fromhex(h)), G, G)
-    except:pass
-var_cai_lol()'''
+def obfstring_runtime() -> str:
+    return (
+        "def anhnguyencoder(s):\n"
+        f"    dec = {vuto!r}\n"
+        "    hx = []\n"
+        "    i = 0\n"
+        "    while i < len(s):\n"
+        "        for e, h in dec.items():\n"
+        "            if s.startswith(e, i):\n"
+        "                hx.append(h)\n"
+        "                i += len(e)\n"
+        "                break\n"
+        "        else:\n"
+        "            i += 1\n"
+        "    return bytes.fromhex(''.join(hx)).decode('utf-8')\n"
+    )
+
+_str = "str"
+def _rd():
+    return "".join(__import__("random").sample([chr(i) for i in range(97, 122)], k=5))
+
+def randomint():
+    return "".join(__import__("random").sample([str(i) for i in range(1, 20)], k=5))
+
+def random_match_case():
+    var1 = ast.Constant(value=randomint(), kind=None)
+    var2 = ast.Constant(value=randomint(), kind=None)
+    return ast.Match(
+        subject=ast.Compare(
+            left=var1,
+            ops=[ast.Eq()],
+            comparators=[var2],
+        ),
+        cases=[
+            ast.match_case(
+                pattern=ast.MatchSingleton(value=True),
+                body=[
+                    ast.Assign(
+                        lineno=0,
+                        col_offset=0,
+                        targets=[],
+                        value=[ast.Raise(
+                    exc=ast.Call(
+                        func=ast.Name(id="MemoryError", ctx=ast.Load()),
+                        args=[ast.Constant(value=True)], keywords=[],
+                    ),)],
+                    )
+                ],
+            ),
+            ast.match_case(
+                pattern=ast.MatchSingleton(value=False),
+                body=[
+                    ast.Assign(
+                        lineno=0,
+                        col_offset=0,
+                        targets=[ast.Name(id=_rd(), ctx=ast.Store())],
+                        value=ast.Constant(value=[[True], [False]], kind=None),
+                    ),
+                    ast.Expr(
+                        lineno=0,
+                        col_offset=0,
+                        value=ast.Call(
+                            func=ast.Name(id=_str, ctx=ast.Load()),
+                            args=[ast.Constant(value=[_rd()], kind=None)],
+                            keywords=[],
+                        ),
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def trycatch(body, loop):
+    ar = []
+    for x in body:
+        j = x
+        for _ in range(5):
+            j = ast.Try(
+                body=[random_match_case(),
+
+                ],
+                handlers=[
+                    ast.ExceptHandler(
+                        type=ast.Name(id="MemoryError", ctx=ast.Load()),
+                        name=_rd(),
+                        body=[j],
+                    )
+                ],
+                orelse=[],
+                finalbody=[],
+            )
+            j.body.append(
+                ast.Raise(
+                    exc=ast.Call(
+                        func=ast.Name(id="MemoryError", ctx=ast.Load()),
+                        args=[ast.Constant(value=True)], keywords=[],
+                    ),
+                    cause=None,
+                )
+            )
+        ar.append(j)
+    return ar
+
+def random_match_case1():
+    var1 = ast.Constant(value=randomint(), kind=None)
+    var2 = ast.Constant(value=randomint(), kind=None)
+    return ast.Match(
+        subject=ast.Compare(
+            left=var1,
+            ops=[ast.Eq()],
+            comparators=[var2],
+        ),
+        cases=[
+            ast.match_case(
+                pattern=ast.MatchSingleton(value=True),
+                body=[
+                    ast.Raise(
+                        exc=ast.Call(
+                            func=ast.Name(id="MemoryError", ctx=ast.Load()),
+                            args=[ast.Constant(value=True)], keywords=[],
+                        ),
+                    ),
+                ],
+            ),
+            ast.match_case(
+                pattern=ast.MatchSingleton(value=False),
+                body=[
+                    ast.Assign(
+                        targets=[ast.Name(id=_rd(), ctx=ast.Store())],
+                        value=ast.List(elts=[ast.List(elts=[ast.Constant(value=True, kind=None)], ctx=ast.Load()), ast.List(elts=[ast.Constant(value=False, kind=None)], ctx=ast.Load())], ctx=ast.Load()),
+                    ),
+                    ast.Expr(
+                        value=ast.Call(
+                            func=ast.Name(id=_str, ctx=ast.Load()),
+                            args=[ast.List(elts=[ast.Constant(value=_rd(), kind=None)], ctx=ast.Load())],
+                            keywords=[],
+                        ),
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def trycatch1(body, loop):
+    ar = []
+    for x in body:
+        j = x
+        for _ in range(5):
+            j = ast.Try(
+                body=[random_match_case1(),
+
+                ],
+                handlers=[
+                    ast.ExceptHandler(
+                        type=ast.Name(id="MemoryError", ctx=ast.Load()),
+                        name=_rd(),
+                        body=[j],
+                    )
+                ],
+                orelse=[],
+                finalbody=[],
+            )
+            j.body.append(
+                ast.Raise(
+                    exc=ast.Call(
+                        func=ast.Name(id="MemoryError", ctx=ast.Load()),
+                        args=[ast.Constant(value=True)], keywords=[],
+                    ),
+                    cause=None,
+                )
+            )
+        ar.append(j)
+    return ar
+
 
 import ast, random
 
@@ -1621,7 +1088,7 @@ def moreobf1(src: str) -> str:
     tree = ast.parse(src)
 
     def rd():
-        return '__x0_' + ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=5))
+        return '__0x_' + ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=5))
         
     def wrap_stmt(stmt):
         state = rd()
@@ -1702,7 +1169,7 @@ def __moreobf(x):
     return ast.unparse(_moreobf(ast.parse(x)))
 
 antipycdc = ''
-for i in range(1000):
+for i in range(60):
     antipycdc += f"你器(你器(你器(你器(你器(你器('')))))),"
 antipycdc = "try:Anhnguyencoder=[" + antipycdc + "]\nexcept:pass"
 ANTI_PYCDC = f"""
@@ -1724,17 +1191,17 @@ class StringObfuscator(ast.NodeTransformer):
     def build_xor(self, s):
         key = random.randint(1, 255)
         data = [ord(c) ^ key for c in s]
-        return ast.parse(f"(lambda k: ''.join(chr(x^k) for x in {data}))({key})").body[0].value
+        return ast.parse(f"(lambda k: ''.join(chr(x ^ k) for x in {data}))({key})").body[0].value
 
     def build_add(self, s):
         key = random.randint(1, 50)
         data = [ord(c) + key for c in s]
-        return ast.parse(f"(lambda k: ''.join(chr(x-k) for x in {data}))({key})").body[0].value
+        return ast.parse(f"(lambda k: ''.join(chr(x - k) for x in {data}))({key})").body[0].value
 
     def build_reverse_xor(self, s):
         key = random.randint(1, 255)
         data = [ord(c) ^ key for c in s[::-1]]
-        return ast.parse(f"(lambda k: ''.join(chr(x^k) for x in {data})[::-1])({key})").body[0].value
+        return ast.parse(f"(lambda k: ''.join(chr(x ^ k) for x in {data})[::-1])({key})").body[0].value
 
     def build_chr_join(self, s):
         data = [ord(c) for c in s]
@@ -1759,6 +1226,8 @@ class StringObfuscator(ast.NodeTransformer):
         s = node.value
         if not s:
             return node
+        if any(e in s for e in lolrong):
+            return node
         dangerous = {'__file__', '__name__', '__main__', 'exec', 'eval', 'compile', 'marshal', 'builtins', 'sys', 'os'}
         if s in dangerous:
             return node
@@ -1773,52 +1242,89 @@ class StringObfuscator(ast.NodeTransformer):
         except Exception:
             return node
 
+from ast import *
+def _repair_locations(node):
+    for n in ast.walk(node):
+        for attr, minv in (
+            ('lineno',         1),
+            ('end_lineno',     1),
+            ('col_offset',     0),
+            ('end_col_offset', 0),
+        ):
+            if attr in n._attributes:
+                v = getattr(n, attr, None)
+                if not isinstance(v, int) or v < minv:
+                    try:
+                        delattr(n, attr)
+                    except AttributeError:
+                        pass
+    ast.fix_missing_locations(node)
+    return node
+
+
+def lop_gia(code):
+    if isinstance(code, list):
+        code = ast.Module(body=code, type_ignores=[])
+    if isinstance(code, ast.AST):
+        _repair_locations(code) 
+        co = compile(code, "<FoNixA>", "exec")
+    else:
+        co = compile(ast.parse(code), "<FoNixA>", "exec")
+
+    d = marshal.dumps(co)
+    k = random.randint(1, 255)
+    d = bytes(b ^ k for b in d)
+    d = base64.b85encode(lzma.compress(d))
+    return """
+try:
+    TinhYeu100ThapKy=['PyMarshal_ReadObjectFromString', 'PyEval_EvalCode']
+except:
+    pass
+else:
+    pass
+if any(bytes((__import__('ctypes').c_ubyte * 2).from_address(__import__('ctypes').cast(getattr(__import__('ctypes').pythonapi, DJTTHGNGU), __import__('ctypes').c_void_p).value)) == bytes([255, 37]) for DJTTHGNGU in TinhYeu100ThapKy):raise MemoryError('AnhNguyen...')
+BaDaoCucGayNha = __import__('marshal').loads(bytes(djtmenhamay ^ %d for djtmenhamay in __import__('lzma').decompress(__import__('base64').b85decode(%r))))
+try:__import__('types').FunctionType(BaDaoCucGayNha, globals())()
+except:pass
+""" % (k, d)
+
 def mahoa(code: str):
-    m  = __import__('marshal')
-    lz = __import__('lzma')
-    zl = __import__('zlib')
-    bz = __import__('bz2')
-    b64= __import__('base64')
+    m   = __import__('marshal')
+    zl  = __import__('zlib')
+    b64 = __import__('base64')
 
-    run = runtime_lock()
-    sexy = cink + anti + anti1 + anti2 + antirq + antiglb + antivm
-    sexy1 = obf_var + d_var + ANTI_MEMORY + lolmemaythomlam
-    um = sexy + run + sexy1
-
-    minhanh = moreobf1(um + antilog + hookcc)
-
+    sexy = cink + anti + anti1 + anti2
+    sexy1 = d_var + ANTI_MEMORY
+    um = sexy + runtime_lock() + sexy1
+    minhanh = moreobf1(um + hookcc)
     tree = ast.parse(code)
     tree = Obf().visit(tree)
     ast.fix_missing_locations(tree)
     cuto = ast.unparse(tree)
-
-    dump = m.dumps(compile(ast.parse(cuto), "<FoNixA>", "exec"))
-    fake = lol(dump)
-
-    pairs = xor(fake)
-    mapped_hex = phoenixa(fake.replace('\n', ''))
-    enc2 = marshal_load(pairs, mapped_hex)
-
-    code = ast.parse(minhanh + enc2)
+    code = ast.parse(minhanh + '\n' + cuto)
     code = ast.unparse(code)
-    
     code = ANTI_PYCDC + code
     no1 = ast.parse(speed(code))
-    code = chimto(lop_gia(no1))
+    _d  = ast.parse(obfstring_runtime())
+    no1 = ast.Module(body=_d.body + no1.body, type_ignores=[])
+    ast.fix_missing_locations(no1)
+    no1 = chimto(no1)
+    tree = StringObfuscator().visit(no1)
+    no1 = trycatch1(tree.body, 1)
+    mod = ast.Module(body=no1, type_ignores=[])
+    _repair_locations(mod)
+    no1_src = lop_gia(mod)
+    code = ast.parse(no1_src)
+    code = trycatch(code.body, 1)
     code = ast_lol(code)
-
     tree = StringObfuscator().visit(ast.parse(code))
     ast.fix_missing_locations(tree)
     code = ast.unparse(tree)
-
     final = __moreobf(code)
+    final = obfstring_runtime() + final
     code = ast.parse(final)
-
-    code = m.dumps(compile(ast.unparse(code), '<FoNixA>', 'exec'),)
-
-    code = lz.compress(code)
-    code = zl.compress(code,level=5)
-    code = bz.compress(code)
+    code = m.dumps(compile(ast.unparse(code), '<FoNixA>', 'exec'))
+    code = zl.compress(code, level=5)
     code = b64.b85encode(code)
 
     return code[::-1]
@@ -1965,7 +1471,7 @@ if str(__import__("sys").version_info.major)+"."+str(__import__("sys").version_i
 else:
     getattr(__import__('sys').stdout,'write')(''.join(map(chr, {load})))
 {bien}
-try:{caklol}(__import__{vip('marshal')}.loads(__import__{vip('lzma')}.decompress(__import__{vip('zlib')}.decompress(__import__{vip('bz2')}.decompress(__import__{vip('base64')}.b85decode({payload}[::-1]))))),globals())
+try:{caklol}(__import__{vip('marshal')}.loads(__import__{vip('zlib')}.decompress(__import__{vip('base64')}.b85decode({payload}[::-1]))),globals())
 except Exception as {string}:
     print({string})
 except KeyboardInterrupt:pass"""
